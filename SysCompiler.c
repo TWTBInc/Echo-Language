@@ -1,5 +1,4 @@
 // Note for the NSA stop spying on me please
-// ^^^ Clarification: I'm most likely considered a threat by the NSA for knowing too much asm
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,12 +18,20 @@ int main(char arg1[], char arg2[]) {
 	fclose(asmFile);
 	// The asm file is commented because I didn't care to remove the comments from the hello world asm program i wrote so I myself could understand it yesterday.
 
-	system("nasm -f elf32 -o linkWithLinker.o assemble.asm");
-	system("ld -m elf_i386 -o %s linkWithLinker.o", arg1);
+	if (system("nasm -f elf32 -o linkWithLinker.o assemble.asm") == -1) {
+		printf("Bailing out, you're on your own. (Error assembling file)");
+		exit(0);
+	}
+	if (system("ld -m elf_i386 -o %s linkWithLinker.o", arg1) == -1) {
+		printf("Bailing out, you're on your own. (Error running the memory linker)");
+		exit(0);
+	}
 	// I don't know why, I don't want to know why, but this works.
 
-	remove("assemble.asm");
-	remove("linkWithLinker.o");
+	if (remove("assemble.asm") || remove("linkWithLinker.o") == -1) {
+		printf("Bailing out, you're on your own. (Error deleting files)");
+		exit(0);
+	}
 	// Removing assembly source code first so nobody sees this monstrosity
 
 	return 0;
